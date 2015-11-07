@@ -35,12 +35,12 @@ def getStructuredDataRollup(data):
   return return_list, split_keys
 
 
-def ConstructQuestionScoringMatrix(question_set, map_structure):
+def ConstructQuestionScoringMatrix(question_set, structured_data_dict):
   n = len(question_set)
   question_list = sorted([question for question in question_set])
   zero_mat = numpy.zeros((n,n))
   df = pandas.DataFrame(zero_mat, index=question_list, columns=question_list)
-  for row in map_structure:
+  for row in structured_data_dict:
     for key, value in row.iteritems():
       # key is the question and value is a dict of keyword to score.
       keyword1, keyword2 = key.split(' or ')
@@ -67,3 +67,21 @@ def GetMarkovScoresList(QuestionSquareMatrix):
   labels = list(NormalizedSquareMatrix.index)
   output = zip(labels, final_score)
   return output
+
+
+def CalculateScores(question_set, structure_map, verbose=True):
+  if verbose:
+    print '\n'
+    print question_set
+  dataframe = ConstructQuestionScoringMatrix(question_set, structure_map)
+  if verbose:
+    print dataframe
+    print '\n'
+  norm_dataframe = NormalizeDataFrame(dataframe)
+  if verbose:
+    print norm_dataframe
+    print '\n'
+  final_scores = GetMarkovScoresList(norm_dataframe)
+  print final_scores
+  print '\n'
+  return final_scores

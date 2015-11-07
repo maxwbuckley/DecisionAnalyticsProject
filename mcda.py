@@ -10,7 +10,7 @@ import lib.mcda_lib as mcda_lib
 TOPLEVEL = set(["'Will they like it?'", "'Will they be good at it?'", 
                 "'Can we afford them?'"])
 
-WILLTHEYBEGOODAIT = set(["Soft Skills", "Technical Skills", "Experience",
+WILLTHEYBEGOODATIT = set(["Soft Skills", "Technical Skills", "Experience",
                          "Education"])
 
 TECHNICALSKILLS = set(["Programmming", "Databases", "Analytics/Statistics"])
@@ -28,25 +28,17 @@ CANWEAFFORDTHEM = set(["Monetary Price", "Enough Responsibility"])
 
 ENOUGHRESPONSIBILITY = set([ "Seniority" ,"Reportees"])
 
-QUESTIONS = [TOPLEVEL, WILLTHEYLIKEIT, WILLTHEYBEGOODAIT, CANWEAFFORDTHEM,
+QUESTIONS = [TOPLEVEL, WILLTHEYLIKEIT, WILLTHEYBEGOODATIT, CANWEAFFORDTHEM,
              TECHNICALSKILLS, EXPERIENCE, EDUCATION, ENOUGHRESPONSIBILITY]
 
 
 
 def main():
   data = mcda_lib.getDataFromGoogleSpreadsheet()
-  map_structure, keys = mcda_lib.getStructuredDataRollup(data)
+  structured_data_dict, keys = mcda_lib.getStructuredDataRollup(data)
 
-  dataframe = mcda_lib.ConstructQuestionScoringMatrix(TOPLEVEL, map_structure)
-  print dataframe
-
-
-  norm_dataframe = mcda_lib.NormalizeDataFrame(dataframe)
-  print norm_dataframe
-
-
-  final_scores = mcda_lib.GetMarkovScoresList(norm_dataframe)
-  print final_scores
+  mcda_lib.CalculateScores(WILLTHEYBEGOODATIT, structured_data_dict, False)
+  mcda_lib.CalculateScores(EDUCATION, structured_data_dict, False)
 
 if __name__ == "__main__":  
   main()
