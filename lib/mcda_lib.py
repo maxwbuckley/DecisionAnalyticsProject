@@ -4,6 +4,9 @@ import gspread
 from oauth2client.client import SignedJwtAssertionCredentials
 import numpy
 import pandas
+from collections import namedtuple
+
+Edge = namedtuple('Edge', ['source', 'target', 'relative_weight'])
 
 def getDataFromGoogleSpreadsheet():
   json_key = json.load(open('MCDA-UCD-8b0b964e491d.json'))
@@ -58,8 +61,13 @@ def NormalizeDataFrame(data_frame):
 
 
 def GetMarkovScoresList(QuestionSquareMatrix):
+  n = len(QuestionSquareMatrix)
+  if n==2:
+    labels = list(QuestionSquareMatrix.index)
+    tempframe = QuestionSquareMatrix/QuestionSquareMatrix.sum().sum()
+    scores = ( tempframe[labels[1]][0], tempframe[labels[0]][1])
+    return zip(labels, scores)
   NormalizedSquareMatrix = NormalizeDataFrame(QuestionSquareMatrix)
-  n = len(NormalizedSquareMatrix)
   transition_matrix = numpy.linalg.matrix_power(NormalizedSquareMatrix, 1000)
   # Need an n * 1 matrix of 1/n to multiply by the transition matrix
   fractional_score_matrix = numpy.ones((n,1))*(1/(n*1.0))
@@ -67,6 +75,21 @@ def GetMarkovScoresList(QuestionSquareMatrix):
   labels = list(NormalizedSquareMatrix.index)
   output = zip(labels, final_score)
   return output
+
+
+def GenerateGraphEdges(source_node, markov_score_list):
+  edge_list = []
+  for score in markov_score_list:
+    edge_list.append(Edge(source_node, score[0], score[1]))
+  return edge_list
+
+
+def GenerateCompleteGraph(question_dict, structured_data_dict):
+  edge_list = []
+  for key, value in question_dict.iteritems():
+    scores = CalculateScores(value, structured_data_dict, False)
+    edge_list.extend(GenerateGraphEdges(key, scores))
+  return edge_list
 
 
 def CalculateScores(question_set, structure_map, verbose=True):
@@ -81,7 +104,8 @@ def CalculateScores(question_set, structure_map, verbose=True):
   if verbose:
     print norm_dataframe
     print '\n'
-  final_scores = GetMarkovScoresList(norm_dataframe)
-  print final_scores
-  print '\n'
+  final_scores = GetMarkovScoresList(dataframe)
+  if verbose:
+    print final_scores
+    print '\n'
   return final_scores
