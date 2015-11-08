@@ -28,33 +28,36 @@ ENOUGHRESPONSIBILITY = set([ "Seniority" ,"Reportees"])
 QUESTIONS_DICT = {'ROOT' : TOPLEVEL, '\'Will they like it?\'' : WILLTHEYLIKEIT,
                   "'Will they be good at it?'" : WILLTHEYBEGOODATIT,
                   "'Can we afford them?'": CANWEAFFORDTHEM, "Technical Skills" :
-                  TECHNICALSKILLS, "Education": EDUCATION,
+                  TECHNICALSKILLS, "Education": EDUCATION, "Experience": EXPERIENCE,
                   "Enough Responsibility" : ENOUGHRESPONSIBILITY}
 
 
 def main():
+  scoring_default = False
   data = mcda_lib.getDataFromGoogleSpreadsheet()
-  structured_data_dict, keys = mcda_lib.getStructuredDataRollup(data)
-  scores = mcda_lib.CalculateScores(CANWEAFFORDTHEM, structured_data_dict, True)
+  structured_data_dict, keys = mcda_lib.getStructuredDataRollup(data, scoring_default)
   all_edges = mcda_lib.GenerateCompleteGraph(QUESTIONS_DICT,
-                                             structured_data_dict)
+                                             structured_data_dict, scoring_default)
   graph = nx.DiGraph()
-
-
   for edge in all_edges:
     graph.add_edge(edge.source, edge.target, weight=edge.relative_weight)
 
   pos=nx.graphviz_layout(graph, prog='dot')
-
   nx.draw_networkx(graph, pos=pos, ax=None, with_labels=True, font_size=7)
   labels = nx.get_edge_attributes(graph,'weight')
   nx.draw_networkx_edge_labels(graph, pos, edge_labels=labels, font_size=7)
 
   plt.draw()
   #plt.savefig("graph.png", dpi=1000)
-
   #plt.show()
-  print(nx.bfs_successors(graph,'ROOT'))
+  print '\n\n'
+  weights = mcda_lib.getEndLevelWeights(graph)
+  cumulative_sum = 0
+  for label, weight in weights:
+    print label, weight
+    cumulative_sum += weight
+  print cumulative_sum
+  #print graph.neighbors('Cultural fit')
 
 if __name__ == "__main__":  
   main()
