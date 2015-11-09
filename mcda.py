@@ -3,8 +3,8 @@
 """ 
 
 import sys
-import lib.mcda_lib as mcda_lib
-
+from lib import mcda_lib
+from lib import scoring
 
 TOPLEVEL = set(['Will they like it?', 'Will they be good at it?', 
                 'Can we afford them?'])
@@ -38,13 +38,14 @@ QUESTIONS_DICT = {'ROOT': TOPLEVEL,
 
 
 def main():
-  scoring_default = False
-  #TODO(Max): Add a bias term for the alternative scoring system.
+  scoring_function = scoring.LinearPositiveOnly
+  bias = .01
+
   data = mcda_lib.GetDataFromGoogleSpreadsheet(
       '13KcEqiK6tq2Vv72jK4np0kIAq2COlRVy1vPe_5DDrCk')
-  structured_data_dict = mcda_lib.GetStructuredDataRollup(data, scoring_default)
+  structured_data_dict = mcda_lib.GetStructuredDataRollup(data)
   graph = mcda_lib.GenerateNetworkGraph(
-      QUESTIONS_DICT, structured_data_dict, scoring_default)
+      QUESTIONS_DICT, structured_data_dict, scoring_function, bias)
 
   print '\n',
   weights = mcda_lib.GetEndLevelWeights(graph)
