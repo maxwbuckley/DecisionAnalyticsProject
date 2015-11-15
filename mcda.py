@@ -39,7 +39,7 @@ QUESTIONS_DICT = {'ROOT': TOPLEVEL,
 
 def main():
   scoring_function = scoring.LinearPositiveOnly
-  bias = .01
+  bias = .1
 
   data = mcda_lib.GetDataFromGoogleSpreadsheet(
       '13KcEqiK6tq2Vv72jK4np0kIAq2COlRVy1vPe_5DDrCk')

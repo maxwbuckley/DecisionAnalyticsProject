@@ -45,12 +45,12 @@ def GetStructuredDataRollup(data):
       row. 
   """
   return_list = []
-  split_keys = set()
   for data_dict in data:
     map_values = {}
     for key, value in data_dict.iteritems():
       if key != 'Timestamp':
-        keyword1, keyword2 = key.split(' or ')
+        keyword1, keyword2 = key.replace('\'','').split(' or ')
+        print keyword1
         # This is where I assign the default scores between +-3 that are used in
         # the scoring functions for the final matrices.
         map_values[key] = {keyword1: 4-value, keyword2: value-4}
@@ -82,7 +82,7 @@ def ConstructQuestionScoringMatrix(question_set, structured_data_dict,
   for row in structured_data_dict:
     for key, value in row.iteritems():
       # key is the question and value is a dict of keyword to score.
-      keyword1, keyword2 = key.split(' or ')
+      keyword1, keyword2 = key.replace('\'','').split(' or ')
       # Just need to check the first of the or words
       if keyword1 in question_set:
         df[keyword1][keyword2] += scoring_function(value[keyword2])
@@ -227,11 +227,12 @@ def PlotNetworkGraph(graph):
   Args:
     graph: A networkx graph object.
   """
+  font_size = 9
   pos=networkx.graphviz_layout(graph, prog='dot')
-  networkx.draw_networkx(graph, pos=pos, ax=None, with_labels=True, font_size=7)
+  networkx.draw_networkx(graph, pos=pos, ax=None, with_labels=True, font_size=font_size)
   labels = networkx.get_edge_attributes(graph,'weight')
   networkx.draw_networkx_edge_labels(graph, pos, edge_labels=labels,
-                                     font_size=7)
+                                     font_size=font_size)
   plt.draw()
   plt.show()
 
