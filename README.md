@@ -1,9 +1,10 @@
 ###MCDA Decision Analytics.
 
 This code implements a MCDA model through Python. It reads input data from a
-Google Spreadsheet which was generated using Google Apps Script using the code in
-generateform.js. This input form data is in likert scales measuring the users
-preferences in a pairwise manner.
+Google Spreadsheet which was generated using Google Apps Script using the code
+in 'generateform.js'. This input form data is captured in Likert scales
+measuring both the direction and magnitude of the users preferences in a
+pairwise fashion.
 
 The output being a final decision tree with weights for the relative importance
 of the different factors in the decision.
